@@ -32,6 +32,7 @@ import org.springframework.ws.soap.client.SoapFaultClientException;
       "authentication",
       "soapVersion",
       "header",
+      "httpHeaders",
       "body",
       "namespaces",
       "connectionTimeoutInSeconds"
@@ -91,7 +92,8 @@ public class SoapConnector implements OutboundConnectorFunction {
               soapBody,
               input.authentication(),
               input.connectionTimeoutInSeconds(),
-              input.namespaces());
+              input.namespaces(),
+              input.httpHeaders());
       JsonNode response =
           Mapper.toJson()
               .withPreserveNamespaces(false)

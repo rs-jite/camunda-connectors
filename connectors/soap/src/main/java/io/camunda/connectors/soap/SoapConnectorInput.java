@@ -45,6 +45,7 @@ public record SoapConnectorInput(
     @Valid Version soapVersion,
     @Valid SoapHeaderPart header,
     @Valid SoapBodyPart body,
+    @Valid Map<String, String> httpHeaders,
     @TemplateProperty(
             label = "Namespaces",
             description = "The namespaces that should be declared on the SOAP Envelope",

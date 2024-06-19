@@ -19,6 +19,7 @@ public interface SoapClient {
       String soapBody,
       Authentication authentication,
       Integer connectionTimeoutInSeconds,
-      Map<String, String> namespaces)
+      Map<String, String> namespaces,
+      Map<String, String> headers)
       throws Exception;
 }

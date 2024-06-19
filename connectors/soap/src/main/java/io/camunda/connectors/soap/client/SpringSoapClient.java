@@ -31,10 +31,7 @@ import java.security.PrivateKey;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
@@ -79,14 +76,16 @@ public class SpringSoapClient implements SoapClient {
       String soapBody,
       Authentication authentication,
       Integer connectionTimeoutInSeconds,
-      Map<String, String> namespaces)
+      Map<String, String> namespaces,
+      Map<String, String> headers)
       throws Exception {
     final var requestFactory = buildRequestFactory(connectionTimeoutInSeconds);
     final var messageSender = buildMessageSender(requestFactory);
     final var messageFactory = buildMessageFactory(soapVersion);
     final var marshaller = buildMarshaller(namespaces);
     final var unmarshaller = buildUnmarshaller(namespaces);
-    ClientInterceptor[] interceptors = buildInterceptors(soapHeader, authentication, namespaces);
+    ClientInterceptor[] interceptors =
+        buildInterceptors(soapHeader, authentication, namespaces, headers);
     WebServiceClient wsClient = new WebServiceClient();
     wsClient.setDefaultUri(serviceUrl);
     wsClient.setMessageSender(messageSender);
@@ -134,11 +133,15 @@ public class SpringSoapClient implements SoapClient {
   }
 
   private ClientInterceptor[] buildInterceptors(
-      String soapHeader, Authentication authentication, Map<String, String> namespaces) {
+      String soapHeader,
+      Authentication authentication,
+      Map<String, String> namespaces,
+      Map<String, String> headers) {
     List<ClientInterceptor> interceptorList = new ArrayList<>();
     handleAuthentication(authentication).ifPresent(interceptorList::add);
     handleSoapHeader(soapHeader, namespaces).ifPresent(interceptorList::add);
     interceptorList.add(new LoggingInterceptor());
+    interceptorList.add(new HttpAddHeaderInterceptor(headers));
     return interceptorList.toArray(new ClientInterceptor[0]);
   }
 
